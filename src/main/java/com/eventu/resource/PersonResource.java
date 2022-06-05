@@ -46,17 +46,16 @@ public class PersonResource {
     }
 
 
-    private AStatus createErrorStatus(String statusDesc){
+    private Person createErrorStatus(String statusDesc){
 
-        AStatus status = AStatus.builder()
-                .status("Error")
-                .error(
+        Person person = Person.builder().build();
+        person.setStatus("Error");
+                person.setError(
                         EventError.builder()
                                 .errorDesc(statusDesc)
                                 .build()
-                )
-                .build();
-        return status;
+                );
+        return person;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.eventu.repository;
 
 import com.eventu.exception.BusinessException;
-import com.eventu.vo.AStatus;
-import com.eventu.vo.EventError;
 import com.eventu.vo.Person;
 import com.mongodb.MongoWriteException;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoRepository;
@@ -15,7 +13,7 @@ public class PersonRepository implements ReactivePanacheMongoRepository<Person> 
 
     public Uni<Person> create(Person person){
 
-        return persist(person).onFailure().transform(f->  new BusinessException(createErrorMessage(f), f)) ;
+        return persist(person).onFailure().transform(f->  new BusinessException("Email already exists",f));//.onFailure().transform(f->  new BusinessException(createErrorMessage(f), f)) ;
 
     }
 

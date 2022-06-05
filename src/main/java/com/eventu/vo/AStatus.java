@@ -1,14 +1,13 @@
 package com.eventu.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+
 public class AStatus {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         public String status;
