@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 public class EventResource {
 
     @Inject
-    EventRepository repository;
+    EventRepository eventRepository;
 
     @Inject
     PersonRepository personRepository;
@@ -28,25 +28,24 @@ public class EventResource {
     @Path("/{person_id}/event")
     public Uni<Response> create(Event event, @PathParam("person_id") String personId){
         //Check if personId exist.
-        //If person does not exist
-        //      then return AStatus error
-        //ELSE
-        //      Create event and eventId in the fetched person
-
-         return personRepository.getPersonById(personId)
-                 .onItem().ifNull()
-                 .fail().onFailure()
-                        .recoverWithItem( f-> {
-                                AStatus status =  createErrorStatus(f.getMessage());
-                                return (Person) status;
-
-        }).map(r-> Response.ok(r).build()) ;
+        Uni<Person> uniPerson = personRepository.getPersonById(personId);
 
 
-        //return response;
-         /*event.persist().onItem()
-               // .call(upda)
-                .transformToUni(resp -> Uni.createFrom().item(Response.ok().entity(resp).build()));*/
+
+        return uniPerson.onItem()
+                .transformToUni(person ->  {
+                    if( person != null){
+                        return eventRepository.create(event, person.getId())
+                                .onItem().transform(e -> Response.ok().entity(e).build());
+                }else {
+                        AStatus status =  createErrorStatus("Person does not exist");
+                        return Uni.createFrom().item( Response.serverError().entity(status).build());
+                    }
+
+                });
+
+
+
 
 
     }

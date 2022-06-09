@@ -19,6 +19,6 @@ public class Event extends ReactivePanacheMongoEntity {
     private  String orgName;
     private String orgUrl;
     private String eventUrl;
-    private String personId;
+    private ObjectId personId;
 
 }
