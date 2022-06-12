@@ -50,7 +50,7 @@ class PersonResourceTest {
     }
     @Test
     @DisplayName("When a new person object is passed then person object with Id should be returned")
-    void create_peron_failure() {
+    void create_person_failure() {
         when(repository.create(any(Person.class))).thenReturn(Uni.createFrom().failure(new MongoException(11000, "Email already exists")));
         given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .body(person).post("/party/person")
