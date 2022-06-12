@@ -36,13 +36,14 @@ public class PersonResource {
         Response response=null;
         return repository.getPersonByEmail(email).onItem().transform(person -> {
             if(person==null){
-                person = new Person();
-                person.setStatus("No Records found");
+                AStatus aStatus= new AStatus();
+                aStatus.setStatus("No Records found");
+                return Response.serverError().entity(aStatus).build();
+            }else{
+                return Response.ok().entity(person).build();
             }
-            return person;
-        }).map(
-                resp-> Response.ok().entity(resp).build()
-        );
+
+        });
     }
 
 

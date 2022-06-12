@@ -30,13 +30,16 @@ public class EventResource {
         //Check if personId exist.
         Uni<Person> uniPerson = personRepository.getPersonById(personId);
 
-
-
         return uniPerson.onItem()
                 .transformToUni(person ->  {
                     if( person != null){
                         return eventRepository.create(event, person.getId())
-                                .onItem().transform(e -> Response.ok().entity(e).build());
+                                .onItem().transform(e -> Response.ok().entity(e).build())
+                                .onFailure()
+                                .recoverWithItem(failure -> {
+                                    AStatus status =  createErrorStatus(failure.getMessage());
+                                    return Response.serverError().entity(status).build();
+                                });
                 }else {
                         AStatus status =  createErrorStatus("Person does not exist");
                         return Uni.createFrom().item( Response.serverError().entity(status).build());
@@ -44,22 +47,18 @@ public class EventResource {
 
                 });
 
-
-
-
-
     }
 
-    private Person createErrorStatus(String statusDesc){
+    private AStatus createErrorStatus(String statusDesc){
 
-        Person person = Person.builder().build();
-        person.setStatus("Error");
-        person.setError(
+        AStatus status = new AStatus();
+        status.setStatus("Error");
+        status.setError(
                 EventError.builder()
                         .errorDesc(statusDesc)
                         .build()
         );
-        return person;
+        return status;
     }
 
 }

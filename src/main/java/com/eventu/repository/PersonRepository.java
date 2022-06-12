@@ -14,7 +14,7 @@ public class PersonRepository implements ReactivePanacheMongoRepository<Person> 
 
     public Uni<Person> create(Person person){
 
-        return persist(person)/*.onFailure().transform(f->  new BusinessException("Email already exists",f));*/
+        return persist(person)
                 .onFailure().transform(f->  new BusinessException(createErrorMessage(f), f)) ;
 
     }
