@@ -85,7 +85,11 @@
     </dependency>
 
   </dependencies>
+
   <build>
+  <pluginManagement>
+
+  </pluginManagement>
     <plugins>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
@@ -137,7 +141,21 @@
               <append>true</append>
             </configuration>
           </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/coverage-reports/aggregate.exec</dataFile>
+              <excludes>
+                <exclude>com/eventu/vo/*.class</exclude>
+              </excludes>
+            </configuration>
+          </execution>
         </executions>
+
       </plugin>
     </plugins>
   </build>

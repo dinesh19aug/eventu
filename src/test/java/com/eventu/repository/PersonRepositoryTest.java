@@ -95,7 +95,7 @@ class PersonRepositoryTest {
     }
 
     @Test
-    @DisplayName("When create is called then return Business exception with Unknown error")
+    @DisplayName("When Person by id is called then return Business exception with Unknown error")
     public void getPersonById_getUniPerson (){
         PersonRepository repository = spy(PersonRepository.class);
         Mockito.doReturn(Uni.createFrom().item(person))
