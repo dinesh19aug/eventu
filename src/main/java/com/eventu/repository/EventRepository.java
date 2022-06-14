@@ -13,7 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class EventRepository implements ReactivePanacheMongoRepository<Event> {
     public Uni<Event> create(Event event, ObjectId personId){
         event.setPersonId(personId);
-        return persist(event)/*.onFailure().transform(f->  new BusinessException("Email already exists",f));*/
+        return persist(event)
                 .onFailure().transform(f->  new BusinessException(createErrorMessage(f), f)) ;
 
     }
