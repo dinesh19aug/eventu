@@ -35,12 +35,13 @@ class EventResourceTest {
 
     @BeforeEach
     public void setUp(){
-        event = Event.builder().eventName("Test Event1")
-                .eventType(Type.PARTY)
-                .orgName("Test org")
-                .eventUrl("http://testevent.com")
-                .orgUrl("http://testOrg.com")
-                .build();
+        event = new Event();
+        event.setEventName("Test Event1");
+        event.setEventType(Type.PARTY);
+        event.setOrgName("Test org");
+        event.setEventUrl("http://testevent.com");
+        event.setOrgUrl("http://testOrg.com");
+
     }
 
     @Test

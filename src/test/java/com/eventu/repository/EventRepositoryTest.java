@@ -25,13 +25,14 @@ class EventRepositoryTest {
 
     @BeforeEach
     public void setUp(){
-        event = Event.builder().eventType(Type.PARTY)
-                .orgUrl("http://test.com")
-                .orgName("Test org")
-                .personId(new ObjectId("6291c6ad7e0450024af5c81a"))
-                .id(new ObjectId("5291c6ad7e0450024af5c82a"))
-                .eventName("Test event")
-                .build();
+        event = new Event();
+        event.setEventType(Type.PARTY);
+        event.setOrgUrl("http://test.com");
+        event.setOrgName("Test org");
+        event.setPersonId(new ObjectId("6291c6ad7e0450024af5c81a"));
+        event.setId(new ObjectId("5291c6ad7e0450024af5c82a"));
+        event.setEventName("Test event");
+
     }
 
     @Test

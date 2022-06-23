@@ -3,22 +3,26 @@ package com.eventu.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntity;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
+import java.util.Map;
+
 @Data
-@Builder
 @MongoEntity(collection="Event")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@NoArgsConstructor
 public class Event extends ReactivePanacheMongoEntity {
 
-    private ObjectId id;
-    private String eventName;
-    private Type eventType;
-    private  String orgName;
-    private String orgUrl;
-    private String eventUrl;
-    private ObjectId personId;
+    public ObjectId id;
+    public String eventName;
+    public Type eventType;
+    public  String orgName;
+    public String orgUrl;
+    public String eventUrl;
+    public ObjectId personId;
+    public Map<String, SubEventSummary> subEventSummaryMap;
+
 
 }
