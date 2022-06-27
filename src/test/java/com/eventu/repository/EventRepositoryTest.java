@@ -1,6 +1,7 @@
 package com.eventu.repository;
 
 import com.eventu.vo.Event;
+import com.eventu.vo.SubEvent;
 import com.eventu.vo.Type;
 import com.mongodb.MongoWriteException;
 import com.mongodb.WriteError;
@@ -68,6 +69,37 @@ class EventRepositoryTest {
         }catch (Exception ex){
             Assertions.assertEquals("Unknown error", ex.getCause().getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("When Subevent is successfully added to Event then return updated event")
+    void addEventSummary_happy_path(){
+        SubEvent subEvent = SubEvent.builder().id(new ObjectId("6291c6ad7e0450024af5c81a")).build();
+        EventRepository repository = spy(EventRepository.class);
+        event.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
+        Mockito.doReturn(Uni.createFrom().item( event)).when(repository).findById(event.getId());
+        Mockito.doReturn(Uni.createFrom().item( event)).when(repository).persistOrUpdate(event);
+        Event e = repository.addEventSummary(event, subEvent).await().atMost(Duration.ofSeconds(1));
+        Assertions.assertEquals(1, e.getSubEventSummaryMap().size());
+    }
+
+    @Test
+    @DisplayName("When EventID is not found then throw exception")
+    void addEventSummary_negative_path(){
+        EventRepository repository = spy(EventRepository.class);
+        SubEvent subEvent = SubEvent.builder().id(new ObjectId("6291c6ad7e0450024af5c81a")).build();
+        event.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
+        Mockito.doReturn(Uni.createFrom().item(event)).when(repository).findById(event.getId());
+        Mockito
+                .doReturn(Uni.createFrom().failure(new MongoWriteException(new WriteError(12000, "Cannot update the event", new BsonDocument()),null)))
+                .when(repository).persistOrUpdate(event);
+
+        try {
+            Event e = repository.addEventSummary(event, subEvent).await().atMost(Duration.ofSeconds(1));
+        }catch (Exception ex){
+            Assertions.assertEquals("Unknown error", ex.getCause().getMessage());
+        }
+
     }
 
 
