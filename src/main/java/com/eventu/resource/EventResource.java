@@ -1,5 +1,6 @@
 package com.eventu.resource;
 
+import com.eventu.repository.AddressRepository;
 import com.eventu.repository.EventRepository;
 import com.eventu.repository.PersonRepository;
 import com.eventu.vo.AStatus;
@@ -24,6 +25,9 @@ public class EventResource {
     @Inject
     PersonRepository personRepository;
 
+    @Inject
+    AddressRepository addressRepository;
+
     @POST
     @Path("/{person_id}/event")
     public Uni<Response> create(Event event, @PathParam("person_id") String personId){
@@ -33,13 +37,7 @@ public class EventResource {
         return uniPerson.onItem()
                 .transformToUni(person ->  {
                     if( person != null){
-                        return eventRepository.create(event, person.getId())
-                                .onItem().transform(e -> Response.ok().entity(e).build())
-                                .onFailure()
-                                .recoverWithItem(failure -> {
-                                    AStatus status =  createErrorStatus(failure.getMessage());
-                                    return Response.serverError().entity(status).build();
-                                });
+                        return createEvent(event, person);
                 }else {
                         AStatus status =  createErrorStatus("Person does not exist");
                         return Uni.createFrom().item( Response.serverError().entity(status).build());
@@ -49,8 +47,27 @@ public class EventResource {
 
     }
 
+    private Uni<Response> createEvent(Event event, Person person) {
+        return eventRepository.create(event, person.getId())
+                .onItem().transformToUni(e ->
+                            addAddressToEvent(e)
 
 
+                .onFailure()
+                .recoverWithItem(failure -> {
+                    AStatus status =  createErrorStatus(failure.getMessage());
+                    return Response.serverError().entity(status).build();
+                }));
+    }
+
+    private Uni<Response> addAddressToEvent(Event e) {
+        return addressRepository.create(e).onItem()
+                        .transformToUni(address ->
+                                eventRepository.addAddress(e,address).onItem()
+                                        .transform(updatedEvent -> Response.ok().entity(updatedEvent).build() )
+
+                        );
+    }
 
 
     private AStatus createErrorStatus(String statusDesc){

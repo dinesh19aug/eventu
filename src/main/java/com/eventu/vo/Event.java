@@ -5,6 +5,7 @@ import io.quarkus.mongodb.panache.common.MongoEntity;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
 import java.util.Map;
@@ -23,6 +24,25 @@ public class Event extends ReactivePanacheMongoEntity {
     public String eventUrl;
     public ObjectId personId;
     public Map<String, SubEventSummary> subEventSummaryMap;
-
-
+    public ObjectId venueAddress;
+    @BsonIgnore
+    private String addressLine_1;
+    @BsonIgnore
+    private String addressLine_2;
+    @BsonIgnore
+    private String roomNumber;
+    @BsonIgnore
+    private String floorNumber;
+    @BsonIgnore
+    private String suiteNumber;
+    @BsonIgnore
+    private String city;
+    @BsonIgnore
+    private String state;
+    @BsonIgnore
+    private String zipCode;
+    @BsonIgnore
+    private String countryCode;
 }
+
+

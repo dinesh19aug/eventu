@@ -32,13 +32,20 @@ public class EventRepository implements ReactivePanacheMongoRepository<Event>, I
                                .onItem().transformToUni(e -> Uni.createFrom().item(e))
                                .onFailure().transform(f->
                                        new BusinessException(createErrorMessage(f, "Cannot update the event"), f));
-
                });
-
-
-
-
     }
+    public Uni<Event> addAddress(Event event, Address address){
+        Uni<Event> uniEvent = this.findById(event.getId());
+        return uniEvent.onItem()
+                .transformToUni(eventObj->{
+                    eventObj.setVenueAddress(address.getId());
+                    return this.persistOrUpdate(eventObj)
+                            .onItem().transformToUni(e -> Uni.createFrom().item(e))
+                            .onFailure().transform(f->
+                                    new BusinessException(createErrorMessage(f, "Cannot update the address to event"), f));
+                });
+    }
+
 
     private SubEventSummary createSubEventSummry(SubEvent subEvent) {
         SubEventSummary subEventSummary = new SubEventSummary();
