@@ -114,6 +114,31 @@ class SubeventResourceTest {
                 .body("speakerName", is("Test Speaker"))
                 .statusCode(200);
     }
-    //TODO Add negative scenarios for details
 
+    @Test
+    @DisplayName("When subevent Id does exist then return Subevent does not exist")
+    void details_subevent_not_exist(){
+        Map parameters = Mockito.mock(Map.class);
+        ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
+        Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
+        Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().nullItem());
+        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).get("/party/event/6291c6ad7e0450024af5c82a/subEvent/5281c5ad6e0340013bf4c71a")
+                .then()
+                .body("error.errorDesc", is("Sub Event does not exist"))
+                .statusCode(500);
+    }
+
+    @Test
+    @DisplayName("When subevent save throws an unknown exception")
+    void details_subevent_exception(){
+        Map parameters = Mockito.mock(Map.class);
+        ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
+        Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
+        Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().failure(new MongoException(12000, "Unknown error")));
+        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).get("/party/event/6291c6ad7e0450024af5c82a/subEvent/5281c5ad6e0340013bf4c71a")
+                .then()
+                .body("error.errorDesc", is("Unknown error"))
+                .statusCode(500);
+    }
 }
+//Mockito.when(eventRepository.create(any(Event.class), any(ObjectId.class))).thenReturn(Uni.createFrom().failure(new MongoException(11000, "Event already exists")));

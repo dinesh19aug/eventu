@@ -26,23 +26,8 @@ public class Event extends ReactivePanacheMongoEntity {
     public Map<String, SubEventSummary> subEventSummaryMap;
     public ObjectId venueAddress;
     @BsonIgnore
-    private String addressLine_1;
-    @BsonIgnore
-    private String addressLine_2;
-    @BsonIgnore
-    private String roomNumber;
-    @BsonIgnore
-    private String floorNumber;
-    @BsonIgnore
-    private String suiteNumber;
-    @BsonIgnore
-    private String city;
-    @BsonIgnore
-    private String state;
-    @BsonIgnore
-    private String zipCode;
-    @BsonIgnore
-    private String countryCode;
+    private Address address;
+
 }
 
 

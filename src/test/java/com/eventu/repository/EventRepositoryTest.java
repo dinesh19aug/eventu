@@ -1,5 +1,6 @@
 package com.eventu.repository;
 
+import com.eventu.vo.Address;
 import com.eventu.vo.Event;
 import com.eventu.vo.SubEvent;
 import com.eventu.vo.Type;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.spy;
 class EventRepositoryTest {
 
     Event event;
+    Address address;
 
     @BeforeEach
     public void setUp(){
@@ -33,6 +35,15 @@ class EventRepositoryTest {
         event.setPersonId(new ObjectId("6291c6ad7e0450024af5c81a"));
         event.setId(new ObjectId("5291c6ad7e0450024af5c82a"));
         event.setEventName("Test event");
+
+        address = new Address();
+        address.setId(new ObjectId());
+        address.setAddressLine_1("Line 1 Adress");
+        address.setAddressLine_2("Line 2 address");
+        address.setCity("Charlotte");
+        address.setState("NC");
+        address.setZipCode("28262");
+        event.setAddress(address);
 
     }
 
@@ -104,5 +115,30 @@ class EventRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("addAddress() updates the address to event object")
+    void addAddress_happy_path(){
+        EventRepository repository = spy(EventRepository.class);
+        Mockito.doReturn(Uni.createFrom().item( event)).when(repository).findById(event.getId());
+        event.setVenueAddress(new ObjectId());
+        Mockito.doReturn(Uni.createFrom().item(event)).when(repository).persistOrUpdate(event);
+        Event ev = repository.addAddress(event, address).await().atMost(Duration.ofSeconds(2));
+        Assertions.assertNotNull(ev.getVenueAddress());
+    }
+
+    @Test
+    @DisplayName("addAddress() unable to update the address to event")
+    void addAddress_exception(){
+        EventRepository repository = spy(EventRepository.class);
+        Mockito.doReturn(Uni.createFrom().item( event)).when(repository).findById(event.getId());
+        event.setVenueAddress(new ObjectId());
+        Mockito.doReturn(Uni.createFrom().failure(new MongoWriteException(new WriteError(11000, "Cannot update the event", new BsonDocument()),null)))
+                .when(repository).persistOrUpdate(event);
+        try{
+        Event ev = repository.addAddress(event, address).await().atMost(Duration.ofSeconds(2));
+    }catch (Exception ex){
+        Assertions.assertEquals("Cannot update the address to event", ex.getCause().getMessage());
+    }
+    }
 
 }
