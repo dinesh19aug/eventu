@@ -1,7 +1,9 @@
 package com.eventu.resource;
 
+import com.eventu.repository.AddressRepository;
 import com.eventu.repository.EventRepository;
 import com.eventu.repository.PersonRepository;
+import com.eventu.vo.Address;
 import com.eventu.vo.Event;
 import com.eventu.vo.Person;
 import com.eventu.vo.Type;
@@ -33,6 +35,9 @@ class EventResourceTest {
     @InjectMock
     EventRepository eventRepository;
 
+    @InjectMock
+    AddressRepository addressRepository;
+
     @BeforeEach
     public void setUp(){
         event = new Event();
@@ -52,6 +57,9 @@ class EventResourceTest {
         Person mockPerson = Mockito.mock(Person.class);
         Mockito.when(personRepository.getPersonById(any(String.class))).thenReturn(Uni.createFrom().item(mockPerson));
         Mockito.when(mockPerson.getId()).thenReturn(new ObjectId("6291c6ad7e0450024af5c81a"));
+        Address mockAddress = Mockito.mock(Address.class);
+        Mockito.when(addressRepository.create(any())).thenReturn(Uni.createFrom().item( mockAddress));
+        Mockito.when(eventRepository.addAddress(any(Event.class), any(Address.class))).thenReturn(Uni.createFrom().item(event));
         given().body(event).header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).post("/party/person/6291c6ad7e0450024af5c82a/event")
                 .then()
                 .statusCode(200)

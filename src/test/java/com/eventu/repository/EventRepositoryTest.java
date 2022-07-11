@@ -74,7 +74,8 @@ class EventRepositoryTest {
     @Test
     @DisplayName("When Subevent is successfully added to Event then return updated event")
     void addEventSummary_happy_path(){
-        SubEvent subEvent = SubEvent.builder().id(new ObjectId("6291c6ad7e0450024af5c81a")).build();
+        SubEvent subEvent = new SubEvent();
+        subEvent.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
         EventRepository repository = spy(EventRepository.class);
         event.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
         Mockito.doReturn(Uni.createFrom().item( event)).when(repository).findById(event.getId());
@@ -87,7 +88,8 @@ class EventRepositoryTest {
     @DisplayName("When EventID is not found then throw exception")
     void addEventSummary_negative_path(){
         EventRepository repository = spy(EventRepository.class);
-        SubEvent subEvent = SubEvent.builder().id(new ObjectId("6291c6ad7e0450024af5c81a")).build();
+        SubEvent subEvent = new SubEvent();
+        subEvent.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
         event.setId(new ObjectId("6291c6ad7e0450024af5c81a"));
         Mockito.doReturn(Uni.createFrom().item(event)).when(repository).findById(event.getId());
         Mockito

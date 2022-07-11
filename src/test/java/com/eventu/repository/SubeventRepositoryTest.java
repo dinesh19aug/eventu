@@ -27,21 +27,21 @@ class SubeventRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        subEvent = SubEvent.builder()
-                .id(new ObjectId("5291c6ad7e0450024af5c82a"))
-                .eventName("Hands on Java workshop")
-                .eventStartDate( LocalDate.of(2022,03,12))
-                .eventEndDate( LocalDate.of(2022,03,30))
-                .startTime(LocalDateTime.now().toLocalTime())
-                .endTime(LocalDateTime.now().plus(30, ChronoUnit.MINUTES).toLocalTime())
-                .speakerName("Test Speaker")
-                .organizationName("Test Org")
-                .organizerName("Test organizer")
-                .eventUrl("http://test.com")
-                .orgUrl("http://test.com")
-                .eventDescription(" Test event description")
-                .eventId(new ObjectId("6291c6ad7e0450024af5c81a"))
-                .build();
+        subEvent = new SubEvent();
+                subEvent.setId(new ObjectId("5291c6ad7e0450024af5c82a"));
+        subEvent.setEventName("Hands on Java workshop");
+        subEvent.setEventStartDate( LocalDate.of(2022,03,12));
+        subEvent.setEventEndDate( LocalDate.of(2022,03,30));
+        subEvent.setStartTime(LocalDateTime.now().toLocalTime());
+        subEvent.setEndTime(LocalDateTime.now().plus(30, ChronoUnit.MINUTES).toLocalTime());
+        subEvent.setSpeakerName("Test Speaker");
+        subEvent.setOrganizationName("Test Org");
+        subEvent.setOrganizerName("Test organizer");
+        subEvent.setEventUrl("http://test.com");
+        subEvent.setOrgUrl("http://test.com");
+        subEvent.setEventDescription(" Test event description");
+        subEvent.setEventId(new ObjectId("6291c6ad7e0450024af5c81a"));
+
     }
 
     @Test

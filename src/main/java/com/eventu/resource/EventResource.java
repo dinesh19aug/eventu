@@ -43,6 +43,10 @@ public class EventResource {
                         return Uni.createFrom().item( Response.serverError().entity(status).build());
                     }
 
+                }).onFailure()
+                .recoverWithItem(failure -> {
+                    AStatus status =  createErrorStatus(failure.getMessage());
+                    return Response.serverError().entity(status).build();
                 });
 
     }
@@ -51,13 +55,7 @@ public class EventResource {
         return eventRepository.create(event, person.getId())
                 .onItem().transformToUni(e ->
                             addAddressToEvent(e)
-
-
-                .onFailure()
-                .recoverWithItem(failure -> {
-                    AStatus status =  createErrorStatus(failure.getMessage());
-                    return Response.serverError().entity(status).build();
-                }));
+                );
     }
 
     private Uni<Response> addAddressToEvent(Event e) {
