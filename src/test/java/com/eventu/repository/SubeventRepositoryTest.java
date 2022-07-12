@@ -24,23 +24,25 @@ import static org.mockito.Mockito.spy;
 class SubeventRepositoryTest {
 
     SubEvent subEvent;
+    SubEvent newSubevent;
 
     @BeforeEach
     void setUp() {
-        subEvent = new SubEvent();
-                subEvent.setId(new ObjectId("5291c6ad7e0450024af5c82a"));
-        subEvent.setEventName("Hands on Java workshop");
-        subEvent.setEventStartDate( LocalDate.of(2022,03,12));
-        subEvent.setEventEndDate( LocalDate.of(2022,03,30));
-        subEvent.setStartTime(LocalDateTime.now().toLocalTime());
-        subEvent.setEndTime(LocalDateTime.now().plus(30, ChronoUnit.MINUTES).toLocalTime());
-        subEvent.setSpeakerName("Test Speaker");
-        subEvent.setOrganizationName("Test Org");
-        subEvent.setOrganizerName("Test organizer");
-        subEvent.setEventUrl("http://test.com");
-        subEvent.setOrgUrl("http://test.com");
-        subEvent.setEventDescription(" Test event description");
-        subEvent.setEventId(new ObjectId("6291c6ad7e0450024af5c81a"));
+        subEvent = new SubEvent(new ObjectId("5291c6ad7e0450024af5c82a"),"Hands on Java workshop",
+                LocalDate.of(2022,03,12),
+                LocalDate.of(2022,03,30),
+                LocalDateTime.now().toLocalTime(),
+                LocalDateTime.now().plus(30, ChronoUnit.MINUTES).toLocalTime(),
+                "Test Speaker","Test organizer","Test Org",
+                "http://eventUrl.com","http://orgUrl.com",
+                " Test event description",new ObjectId("6291c6ad7e0450024af5c81a"));
+
+    newSubevent = new SubEvent(null,"UPDATED::Hands on Java workshop",LocalDate.of(2022,03,12),
+                LocalDate.of(2022,03,30),
+                LocalDateTime.now().toLocalTime(),
+                LocalDateTime.now().plus(30, ChronoUnit.MINUTES).toLocalTime(),
+                "Test Speaker","Test organizer","Test Org","http://eventUrl.com","http://orgUrl.com",
+                " Test event description",new ObjectId("6291c6ad7e0450024af5c81a"));
 
     }
 
@@ -76,6 +78,29 @@ class SubeventRepositoryTest {
             repository.create(subEvent,new ObjectId("6291c6ad7e0450024af5c81a")).await().atMost(Duration.ofSeconds(3));
         }catch (Exception ex){
             Assertions.assertEquals("Unknown error", ex.getCause().getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("When event to be updated is correctly updated then return update Uni<SubEvent>")
+    void updateSubEvent_happyPath(){
+        SubeventRepository repository = spy(SubeventRepository.class);
+        doReturn(Uni.createFrom().item(subEvent)).when(repository).update(any(SubEvent.class));
+        SubEvent result =  repository.updateSubEvent(subEvent, newSubevent).await().indefinitely();
+        Assertions.assertEquals(result.getEventName(), "UPDATED::Hands on Java workshop");
+
+    }
+
+    @Test
+    @DisplayName("Return a error when the Subevent is duplicate ")
+    void updateSubEvent_return_Subevent_exists(){
+        SubeventRepository repository = spy(SubeventRepository.class);
+        Mockito.doReturn(Uni.createFrom().failure( new MongoWriteException(new WriteError(11000, "Duplicate value", new BsonDocument()),null)))
+                .when(repository).update(any(SubEvent.class));
+        try{
+            repository.updateSubEvent(subEvent, newSubevent).await().indefinitely();
+        }catch (Exception ex){
+            Assertions.assertEquals("Unable to update the Subevent", ex.getCause().getMessage());
         }
     }
 }

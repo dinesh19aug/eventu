@@ -2,7 +2,6 @@ package com.eventu.resource;
 
 import com.eventu.repository.EventRepository;
 import com.eventu.repository.SubeventRepository;
-import com.eventu.vo.AStatus;
 import com.eventu.vo.Event;
 import com.eventu.vo.SubEvent;
 import io.quarkus.logging.Log;
@@ -45,13 +44,10 @@ public class SubEventResource implements IResource {
                                     return Response.ok().entity(se).build();
                                 })
                                 .onFailure()
-                                .recoverWithItem(failure -> {
-                                    AStatus status =  createErrorStatus(failure.getMessage());
-                                    return Response.serverError().entity(status).build();
-                                });
+                                .recoverWithUni(failure-> getErrorResponse(failure.getMessage()));
                 }else {
-                        AStatus status =  createErrorStatus("Event does not exist");
-                        return Uni.createFrom().item( Response.serverError().entity(status).build());
+                        return getErrorResponse("Event does not exist");
+
                     }
                 });
     }
@@ -60,25 +56,56 @@ public class SubEventResource implements IResource {
     @Path("{event_id}/subEvent/{subEvent_id}")
     public Uni<Response> details( @PathParam("event_id") String eventId, @PathParam("subEvent_id") String subEventId){
 
-        Uni<SubEvent> uniEvent = subeventRepository
+        Uni<SubEvent> uniSubEvent = subeventRepository
                 .find("_id = :id and eventId = :eventId", Parameters.with("id", new ObjectId(subEventId)).and("eventId", new ObjectId(eventId)).map() )
                 .firstResult();
 
-        return uniEvent.onItem()
-                .transform(se -> {
+        return uniSubEvent.onItem()
+                .transformToUni(se -> {
                     if(se!=null) {
-                        return Response.ok().entity(se).build();
+                        return Uni.createFrom().item( Response.ok().entity(se).build());
                     }else{
-                        AStatus status =  createErrorStatus("Sub Event does not exist");
-                        return  Response.serverError().entity(status).build();
+                        return getErrorResponse("Sub Event does not exist");
                     }
 
                 })
                 .onFailure()
-                .recoverWithItem(failure -> {
-                    AStatus status =  createErrorStatus(failure.getMessage());
-                    return Response.serverError().entity(status).build();
-                });
+                .recoverWithUni(failure-> getErrorResponse(failure.getMessage()));
+    }
+
+
+
+    @PUT
+    @Path("{event_id}/subEvent/{subEvent_id}")
+    public Uni<Response> update(@PathParam("event_id") String eventId, @PathParam("subEvent_id") String subEventId, SubEvent subEvent){
+        Uni<SubEvent> uniSubEvent = subeventRepository
+                .find("_id = :id and eventId = :eventId", Parameters.with("id", new ObjectId(subEventId)).and("eventId", new ObjectId(eventId)).map() )
+                .firstResult();
+        return uniSubEvent.onItem()
+                .transformToUni(se-> {
+                    if(se!=null){
+                         return updateSubEvent(se,subEvent);
+                    }else{
+                        return getErrorResponse("Sub Event does not exist");
+
+                    }
+                }).onFailure().recoverWithUni(failure-> getErrorResponse(failure.getMessage()));
 
     }
+
+    private Uni<Response> updateSubEvent(SubEvent se, SubEvent subEvent) {
+        return subeventRepository.updateSubEvent(se, subEvent)
+               .onItem().transformToUni(updatedSe -> Uni.createFrom().item(Response.ok().entity(updatedSe).build()));
+    }
+
+    @DELETE
+    @Path("{event_id}/subEvent/{subEvent_id}")
+    public Uni<Response> delete(@PathParam("event_id") String eventId, @PathParam("subEvent_id") String subeventId){
+        //TODO Write code for delete
+        //TODO remove subEventId from event.summaryMap
+        return null;
+    }
+
+
+
 }

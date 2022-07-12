@@ -22,11 +22,10 @@ public class EventRepository implements ReactivePanacheMongoRepository<Event>, I
        Uni<Event> uniEvent = this.findById(event.getId());
        return uniEvent.onItem()
                .transformToUni(eventObj->{
-
                        if(eventObj.subEventSummaryMap==null){
                            eventObj.subEventSummaryMap=new HashMap<>();
                        }
-                       SubEventSummary subEventSummary = createSubEventSummry(subEvent);
+                       SubEventSummary subEventSummary = createSubEventSummary(subEvent);
                        eventObj.getSubEventSummaryMap().put(subEvent.getId().toString(),subEventSummary);
                        return this.persistOrUpdate(eventObj)
                                .onItem().transformToUni(e -> Uni.createFrom().item(e))
@@ -47,7 +46,7 @@ public class EventRepository implements ReactivePanacheMongoRepository<Event>, I
     }
 
 
-    private SubEventSummary createSubEventSummry(SubEvent subEvent) {
+    private SubEventSummary createSubEventSummary(SubEvent subEvent) {
         SubEventSummary subEventSummary = new SubEventSummary();
         subEventSummary.setEventName(subEvent.getEventName());
         subEventSummary.setEventStartDate(subEvent.getEventStartDate());

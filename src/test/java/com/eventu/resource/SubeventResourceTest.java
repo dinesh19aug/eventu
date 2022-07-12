@@ -118,7 +118,7 @@ class SubeventResourceTest {
     @Test
     @DisplayName("When subevent Id does exist then return Subevent does not exist")
     void details_subevent_not_exist(){
-        Map parameters = Mockito.mock(Map.class);
+
         ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
         Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
         Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().nullItem());
@@ -131,7 +131,6 @@ class SubeventResourceTest {
     @Test
     @DisplayName("When subevent save throws an unknown exception")
     void details_subevent_exception(){
-        Map parameters = Mockito.mock(Map.class);
         ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
         Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
         Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().failure(new MongoException(12000, "Unknown error")));
@@ -140,5 +139,49 @@ class SubeventResourceTest {
                 .body("error.errorDesc", is("Unknown error"))
                 .statusCode(500);
     }
+
+    @Test
+    @DisplayName("When existing subEvent is updated sucecssfully then return Subevent with status - 200")
+    void update_happyPath(){
+        ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
+        Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
+        Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().item(subEvent));
+        Mockito.when(subeventRepository.updateSubEvent(any(),any())).thenReturn(Uni.createFrom().item(subEvent));
+        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .body(subEvent)
+                .put("/party/event/6291c6ad7e0450024af5c82a/subEvent/5281c5ad6e0340013bf4c71a")
+
+                .then()
+                .body("speakerName", is("Test Speaker"))
+                .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("When subevent to be updated does exist then return error Subevent does not exist")
+    void update_subevent_not_exist(){
+
+        ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
+        Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
+        Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().nullItem());
+        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .body(subEvent)
+                .put("/party/event/6291c6ad7e0450024af5c82a/subEvent/5281c5ad6e0340013bf4c71a")
+                .then()
+                .body("error.errorDesc", is("Sub Event does not exist"))
+                .statusCode(500);
+    }
+
+    @Test
+    @DisplayName("When subevent to be updated throws an unknown exception")
+    void update_subevent_exception(){
+        ReactivePanacheQuery<SubEvent> query = Mockito.mock(ReactivePanacheQuery.class);
+        Mockito.when(subeventRepository.find(any(), any(Map.class))).thenReturn( query);
+        Mockito.when(query.firstResult()).thenReturn(Uni.createFrom().failure(new MongoException(12000, "Unknown error")));
+        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .body(subEvent)
+                .put("/party/event/6291c6ad7e0450024af5c82a/subEvent/5281c5ad6e0340013bf4c71a")
+                .then()
+                .body("error.errorDesc", is("Unknown error"))
+                .statusCode(500);
+    }
 }
-//Mockito.when(eventRepository.create(any(Event.class), any(ObjectId.class))).thenReturn(Uni.createFrom().failure(new MongoException(11000, "Event already exists")));
