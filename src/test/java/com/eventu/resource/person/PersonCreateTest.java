@@ -1,4 +1,4 @@
-package com.eventu.resource;
+package com.eventu.resource.person;
 
 import com.eventu.repository.PersonRepository;
 import com.eventu.vo.Address;
@@ -21,15 +21,12 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
-
 @QuarkusTest
-class PersonResourceTest {
-
+class PersonCreateTest {
     @InjectMock
     PersonRepository repository;
     @Inject
-    PersonResource resource;
+    PersonCreate resource;
     Uni<Person> uniPerson;
     Person person;
     @BeforeEach
@@ -48,6 +45,7 @@ class PersonResourceTest {
         when(repository.create(any(Person.class))).thenReturn(uniPerson);
 
     }
+
     @Test
     @DisplayName("When a new person object is passed then person object with Id should be returned")
     void create_person_failure() {
@@ -68,26 +66,4 @@ class PersonResourceTest {
                 .then().statusCode(200)
                 .body("address.addressLine_1", is("1000 Test dr"));
     }
-
-    @Test
-    @DisplayName("When person email exists Then get a person object")
-    void get_personByEmail_success() {
-        Mockito.when(repository.getPersonByEmail(any(String.class))).thenReturn(Uni.createFrom().item(person));
-        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .body(person).get("/party/person/test@test.com")
-                .then().statusCode(200)
-                .body("address.addressLine_1", is("1000 Test dr"));
-    }
-
-    @Test
-    @DisplayName("When person email does not exists Then show message that 'Person does not exist'")
-    void get_personByEmail_not_found() {
-        Mockito.when(repository.getPersonByEmail(any(String.class))).thenReturn(Uni.createFrom().nullItem());
-        given().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .body(person).get("/party/person/test@test.com")
-                .then().statusCode(500)
-                .body("status", is("No Records found"));
-    }
-
-
 }
