@@ -1,4 +1,4 @@
-package com.eventu.resource;
+package com.eventu.resource.event;
 
 import com.eventu.repository.AddressRepository;
 import com.eventu.repository.EventRepository;
@@ -9,6 +9,7 @@ import com.eventu.vo.EventError;
 import com.eventu.vo.Person;
 import io.smallrye.mutiny.Uni;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,7 +18,8 @@ import javax.ws.rs.core.Response;
 @Path("/party/person")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class EventResource {
+@RequestScoped
+public class EventCreate {
 
     @Inject
     EventRepository eventRepository;

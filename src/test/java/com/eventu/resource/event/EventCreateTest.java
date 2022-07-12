@@ -1,4 +1,4 @@
-package com.eventu.resource;
+package com.eventu.resource.event;
 
 import com.eventu.repository.AddressRepository;
 import com.eventu.repository.EventRepository;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 
 @QuarkusTest
-class EventResourceTest {
+class EventCreateTest {
 
     Event event;
     @InjectMock
